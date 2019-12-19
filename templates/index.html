@@ -9,8 +9,16 @@
                 {% raw -%}
                     <a href="#" class="toselect">{{ contents }}</a>
                 {%- endraw %}
-            </div>
+            </div>            
         </script>
+        <script id="chat" type="text/x-handlebars-template">
+            <div class="chat">
+                {% raw -%}
+                    <p>{{ contents }}</p>
+                {%- endraw %}
+            </div>           
+        </script>
+        
         <title>Me Talking To You</title>
     </head>
     <body>

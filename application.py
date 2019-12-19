@@ -9,7 +9,7 @@ socketio = SocketIO(app)
 
 displaynames = []
 texts = []
-channels = {"thechannel": {},"bestechannel": {}}
+channels = {"thechannel": ["hoi hoi hoi, dit is thechannel", "tweede bericht thechannel"],"bestechannel": ["maar dit is de beste", "en het beste tweede bericht"]}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -48,3 +48,10 @@ def createdisplayname(data):
 def getchannels():
     print("return channels", list(channels.keys()))
     emit("return channels", list(channels.keys()))
+
+
+@socketio.on("join channel")
+def joinchannel(data):
+    print(channels[data["channelname"]])
+    emit("channel joined", channels[data["channelname"]])
+

@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
             //alert(`hello, ${displayname}`);
             socket.emit('create displayname', {'displayname': displayname});
         }
-
     }
     else {        
         displayall.call();        
@@ -26,19 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
        
     document.addEventListener('click', event => {
         const element = event.target;
-        if (element.className === 'toselect') {
-            //alert('hoi');
-            //const channel = post_template({'contents': "hoihoih"});
-
-            // Add post to DOM.
-            //document.querySelector('#channeldiv').innerHTML += channel;
-
-            document.querySelector("#chatareadiv").innerHTML = element.innerHTML;
-
-            //element.parentElement.style.animationPlayState = 'running';
-            //element.parentElement.addEventListener('animationend', () =>  {
-            //    element.parentElement.remove();
-            //});
+        if (element.className === 'toselect') {            
+            document.querySelector("#chatareadiv").innerHTML = "you joined the channel: " + element.innerHTML;
+            socket.emit('join channel', {'channelname': element.innerHTML});
         }
     });
 
@@ -46,10 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function add_channel(contents) {    
         const channel = post_template({'contents': contents});
         // Add post to DOM.
-        document.querySelector('#channeldiv').innerHTML += channel;
+        document.querySelector('#channeldiv').innerHTML += channel;        
     }
     
-    
+    const p_template = Handlebars.compile(document.querySelector('#chat').innerHTML);
+    function add_chat(contents) {    
+        const chat = p_template({'contents': contents});
+        // Add post to DOM.
+        alert(`hello, ${displayname}`);
+        document.querySelector('#chatareadiv').innerHTML += chat;        
+    }
+
+
+
     // When connected, configure buttons
     socket.on('connect', () => {       
 
@@ -87,7 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(add_channel);         
     });
 
-    socket.on('announce vote', data => {
-              
+    socket.on('channel joined', data => {  
+                  
+        data.forEach(add_chat); 
     });
 });
