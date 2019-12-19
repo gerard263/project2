@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script id="channel" type="text/x-handlebars-template">
+            <div class="channel">
+                {% raw -%}
+                    <a href="#" class="toselect">{{ contents }}</a>
+                {%- endraw %}
+            </div>
+        </script>
+        <title>Me Talking To You</title>
+    </head>
+    <body>
+        <div id="displaynamediv">displaynamediv</div>
+        <div id="channeldiv">channeldiv</div>
+        <div id="chatareadiv">chatareadiv</div>
+        <div id="posttextdiv">
+            <form action="" method="POST">
+                <input type="text" name="chattext">
+                <input type="submit">
+            </form>
+        </div>
+
+        
+    </body>
+</html>
