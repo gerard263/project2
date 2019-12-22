@@ -24,8 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const element = event.target;
             if (element.className === 'toselect') {            
                 localStorage.setItem('currentchannel', element.innerHTML); 
-                socket.emit('join channel', {'channelname': element.innerHTML});
-            
+                socket.emit('join channel', {'channelname': element.innerHTML});            
+            }
+            if (element.className === 'submitchattext') {
+                
+                const request = new XMLHttpRequest();
+                request.open('POST', '/sendchatmessage');                               
+
+                // Add start and end points to request data.
+                const data = new FormData();
+                data.append('displayname', localStorage.getItem('displayname'));
+                data.append('currentchannel', localStorage.getItem("currentchannel"));                
+                data.append('chattext', document.querySelector('#chattext').value);
+                
+                // Send request.
+                request.send(data);
+                document.querySelector('#chattext').value = '';
             }
         });
     });
@@ -42,11 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector("#currentchanneldiv").innerHTML = "current channel is: " + localStorage.getItem("currentchannel");                
         document.querySelectorAll(".chat").forEach (chat => chat.remove());
         data.forEach(add_chat);         
-        document.querySelector('#posttextdiv').innerHTML = `<form action="" method="POST">
-                <input type="text" name="chattext">
-                <input type="submit">
-                </form>`;
-    }
+        document.querySelector('#posttextdiv').innerHTML = `<input type="text" id="chattext"><button class="submitchattext">send</button>`;
+    }                                                      
 
     const post_template = Handlebars.compile(document.querySelector('#channel').innerHTML);
     function add_channel(contents) {    
@@ -104,6 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('channel created', data => {
         add_channel(data); 
     });
+
+    socket.on('new chat message', data => {        
+        add_chat(data); 
+    });   
+    
 
     socket.on('send error', data => {
         alert(data); 

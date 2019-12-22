@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 
@@ -23,12 +23,18 @@ def index():
     return render_template("index.html")
 
 
-@socketio.on("submit text")
-def submittext(data):
-    chattext = data["chattext"]
-    
-    
-    emit("vote totals", chattext, broadcast=True)
+@app.route("/sendchatmessage", methods=["POST"])
+def sendchatmessage():
+    displayname = request.form.get("displayname")
+    currentchannel = request.form.get("currentchannel")
+    chattext = request.form.get("chattext")
+    chatmessage = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " " + displayname + ": " + chattext
+    channels[currentchannel].append(chatmessage)
+    print(displayname, " just sent: ", chattext, " in ", currentchannel)
+    #emit("new chat message", "verstuurd", broadcast=True)
+    socketio.emit("new chat message", chatmessage, broadcast=True)    
+    #emit("new chat message", chattext, broadcast=True)
+    return jsonify({"displayname": displayname})
 
 
 @socketio.on("create displayname")
