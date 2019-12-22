@@ -45,9 +45,15 @@ def createdisplayname(data):
 
 
 @socketio.on("get channels")
-def getchannels():
-    print("return channels", list(channels.keys()))
-    emit("return channels", list(channels.keys()))
+def getchannels(data):
+    returnchannels = {}
+    returnchannels["channellist"] = list(channels.keys())
+    if data["currentchannel"]:
+        returnchannels["channeltexts"] = channels[data["currentchannel"]]    
+        returnchannels["currentchannel"] = data["currentchannel"]    
+    print("getchannels: return channels", returnchannels)
+    emit("return channels", returnchannels)
+    #emit("return channels", {"channellist": list(channels.keys()), "channeltexts": channels[currentchannel]})
 
 
 @socketio.on("join channel")
@@ -55,3 +61,12 @@ def joinchannel(data):
     print(channels[data["channelname"]])
     emit("channel joined", channels[data["channelname"]])
 
+
+@socketio.on("create channel")
+def createchannel(data):
+    if not data["newchannelname"] in channels:
+        channels[data["newchannelname"]] = []
+        print("new channel name added. channels = ",channels)
+        emit("channel created", data["newchannelname"], broadcast=True)
+    else:
+        emit("send error", errormessage = "cannot create channel that already exists")
