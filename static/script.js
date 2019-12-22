@@ -17,15 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         else {        
-            displayall.call();
+            displayall();
         }
 
         document.addEventListener('click', event => {
             const element = event.target;
             if (element.className === 'toselect') {            
-                document.querySelector("#chatareadiv").innerHTML = "you joined the channel: " + element.innerHTML;
                 localStorage.setItem('currentchannel', element.innerHTML); 
                 socket.emit('join channel', {'channelname': element.innerHTML});
+            
             }
         });
     });
@@ -36,6 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector("#displaynamediv").innerHTML = `welcome, ${displayname}`;                  
         socket.emit('get channels', {'currentchannel': localStorage.getItem("currentchannel")});
     }           
+
+
+    function displaychat(data) {
+        document.querySelector("#currentchanneldiv").innerHTML = "current channel is: " + localStorage.getItem("currentchannel");                
+        document.querySelectorAll(".chat").forEach (chat => chat.remove());
+        data.forEach(add_chat);         
+        document.querySelector('#posttextdiv').innerHTML = `<form action="" method="POST">
+                <input type="text" name="chattext">
+                <input type="submit">
+                </form>`;
+    }
 
     const post_template = Handlebars.compile(document.querySelector('#channel').innerHTML);
     function add_channel(contents) {    
@@ -52,12 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#chatareadiv').innerHTML += chat;        
     }
 
-    // When a new vote is announced, add to the unordered list
-    socket.on('new messages', data => {
-        document.querySelector('#yes').innerHTML = data.yes;
-        document.querySelector('#no').innerHTML = data.no;
-        document.querySelector('#maybe').innerHTML = data.maybe;
-    });
 
     socket.on('displayname added', data => {        
         localStorage.setItem('displayname', data); 
@@ -73,18 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('return channels', data => { 
-        document.querySelector("#channeldiv").innerHTML = '';       
+        document.querySelector("#channeldiv").innerHTML = 'channels:';       
         data.channellist.forEach(add_channel);         
         if ("currentchannel" in data) {
+            displaychat(data.channeltexts)
             //alert(`currentchannel in data`);
-            data.channeltexts.forEach(add_chat); 
+            //data.channeltexts.forEach(add_chat); 
             //document.querySelector("#channeldiv").innerHTML = '';
             
         }        
-        else {
+        else {            
             //alert(`currentchannel not in data`);
         }
-        document.querySelector("#channeldiv").innerHTML += `<p><input type="text" id="addchanneltxt"><button id="addchannelbtn">Add channel</button> </p>`;
+        document.querySelector("#addchanneldiv").innerHTML = `<p><input type="text" id="addchanneltxt"><button id="addchannelbtn">Add channel</button> </p>`;
         document.querySelector("#addchannelbtn").onclick = () => {                                   
             newchannelname = document.querySelector('#addchanneltxt').value;                        
             socket.emit('create channel', {'newchannelname': newchannelname});
@@ -92,11 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('channel joined', data => {
-        data.forEach(add_chat); 
+        displaychat(data)        
     });
 
     socket.on('channel created', data => {
-        add_chat(data); 
+        add_channel(data); 
     });
 
     socket.on('send error', data => {

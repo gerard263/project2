@@ -26,7 +26,8 @@ def index():
 @socketio.on("submit text")
 def submittext(data):
     chattext = data["chattext"]
-    #displayname = data["displayname"]
+    
+    
     emit("vote totals", chattext, broadcast=True)
 
 
@@ -69,4 +70,4 @@ def createchannel(data):
         print("new channel name added. channels = ",channels)
         emit("channel created", data["newchannelname"], broadcast=True)
     else:
-        emit("send error", errormessage = "cannot create channel that already exists")
+        emit("send error", "cannot create channel that already exists")
