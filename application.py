@@ -7,19 +7,13 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
+privatedict = {}
 displaynames = []
 texts = []
-channels = {"thechannel": ["hoi hoi hoi, dit is thechannel", "tweede bericht thechannel"],"bestechannel": ["maar dit is de beste", "en het beste tweede bericht"]}
+channels = {"dummy": ["hi, this is just a dummy channel"],"bestechannel": ["maar dit is de beste", "en het beste tweede bericht"]}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    #if request.method == "POST": 
-    #    displayname = request.form.get("displayname")
-    #    if displayname is None:
-    #        return render_template("error.html", message="please provide a display name")
-    #    if username == "":
-    #        return render_template("error.html", message="please provide a display name")
-    #    return render_template("login.html")
     return render_template("index.html")
 
 
@@ -30,25 +24,21 @@ def sendchatmessage():
     chattext = request.form.get("chattext")
     chatmessage = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " " + displayname + ": " + chattext
     channels[currentchannel].append(chatmessage)
-    print(displayname, " just sent: ", chattext, " in ", currentchannel)
-    #emit("new chat message", "verstuurd", broadcast=True)
-    socketio.emit("new chat message", chatmessage, broadcast=True)    
-    #emit("new chat message", chattext, broadcast=True)
+    if len(channels[currentchannel]) > 100:
+        del channels[currentchannel][0]
+    socketio.emit("new chat message", {"chatmessage": chatmessage, "channel": currentchannel}, broadcast=True)    
     return jsonify({"displayname": displayname})
 
 
 @socketio.on("create displayname")
 def createdisplayname(data):
-    #return "hello, displayname"
     displayname = data["displayname"]
-    print(displayname)
-    #return render_template("index.html")
-    #displayname = data["displayname"]
     if displayname in displaynames:
         emit("displayname taken", displayname)
     else:
         displaynames.append(displayname)
         emit("displayname added", displayname)
+        privatedict[displayname] = request.sid
 
 
 @socketio.on("get channels")
@@ -77,3 +67,18 @@ def createchannel(data):
         emit("channel created", data["newchannelname"], broadcast=True)
     else:
         emit("send error", "cannot create channel that already exists")
+
+
+@socketio.on("send private")
+def sendprivate(data):
+    print("private message, data = ", data)
+    if data["privatescreenname"] in privatedict:
+        print(data["privatescreenname"], " exists in ", privatedict)
+        emit("new private message", datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "<you received a private message from " + data["displayname"] + ">: " + data["privatetext"], room=privatedict[data["privatescreenname"]])   
+        emit("new private message", datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "<you sent a private message to " + data["privatescreenname"] + ">: " + data["privatetext"])
+    else:
+        print("error name not found")
+        emit("send error", "error, private message not sent. Cannot find user with screenname " + data["privatescreenname"])
+
+    
+    #emit("private message", channels[data["channelname"]])
