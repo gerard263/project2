@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector("#currentchanneldiv").innerHTML = "<h4>current channel is: " + localStorage.getItem("currentchannel") + "</h4>";                
         document.querySelectorAll(".chat").forEach (chat => chat.remove());
         data.forEach(add_chat);         
-        document.querySelector('#posttextdiv').innerHTML = `<input type="text" id="chattext" placeholder="chat text..."><button class="submitchattext">send</button>`;
-        document.querySelector('#privatemessagediv').innerHTML = `<input type="text" id="privatetext" placeholder="private chat text..."><input type="text" id="privatescreenname" placeholder="to screenname"><button class="submitprivatetext">send private message</button>`;        
+        document.querySelector('#posttextdiv').innerHTML = `<h4><input type="text" id="chattext" placeholder="chat text..."><button class="submitchattext">send</button></h4>`;
+        document.querySelector('#privatemessagediv').innerHTML = `<h4><input type="text" id="privatetext" placeholder="private chat text..."><input type="text" id="privatescreenname" placeholder="to screenname"><button class="submitprivatetext">send private message</button></h4>`;        
     }                                                      
 
     const post_template = Handlebars.compile(document.querySelector('#channel').innerHTML);
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else {            
             //alert(`currentchannel not in data`);
         }
-        document.querySelector("#addchanneldiv").innerHTML = `<p><input type="text" id="addchanneltxt" placeholder="new channel name"><button id="addchannelbtn">Add channel</button> </p>`;
+        document.querySelector("#addchanneldiv").innerHTML = `<h4><p><input type="text" id="addchanneltxt" placeholder="new channel name"><button id="addchannelbtn">Add channel</button> </p></h4>`;
         document.querySelector("#addchannelbtn").onclick = () => {                                   
             newchannelname = document.querySelector('#addchanneltxt').value;                        
             socket.emit('create channel', {'newchannelname': newchannelname});

@@ -7,34 +7,37 @@
 }
 
 #displaynamediv {
-  padding: 25px;
+  margin: 25px;
 }
 
 #currentchanneldiv {
-  padding: 25px;
+  margin: 25px;
 }
 
 #channeldiv {
   margin: 25px;
-  padding: 5px;
-  border-style: solid;
-  border-width: 2px;
 }
 
 #addchanneldiv {
-  padding: 25px;
+  margin: 25px;
 }
 
 #chatareadiv {
-  padding: 25px;
+  margin: 25px;
 }
 
 #posttextdiv {
-  padding: 25px;
+  margin: 25px;
 }
 
 #privatemessagediv {
-  padding: 25px;
+  margin: 25px;
+}
+
+.chat {
+  margin: 1px;
+  padding: 3px;
+  background-color: lightgray;
 }
 
 /*# sourceMappingURL=styles.css.map */
